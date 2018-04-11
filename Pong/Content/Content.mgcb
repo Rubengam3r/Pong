@@ -40,3 +40,9 @@
 #begin Consolas78.xnb
 /copy:Consolas78.xnb
 
+#begin 0831.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:0831.wav
+

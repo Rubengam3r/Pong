@@ -19,7 +19,7 @@ namespace Pong.iOS
         private Paddle playerPaddle;
         private Ball ball;
         private Score score;
-        private SoundEffect ballsong;
+       // private SoundEffect ballsong;
         private SoundEffect scoreSound;
 
         /// <summary>
@@ -77,9 +77,9 @@ namespace Pong.iOS
 
             score = new Score(Content.Load<SpriteFont>("Consolas78"),gameBoundaries);
 
-           // ballsong = Content.Load<SoundEffect>("blip");
-           // scoreSound = Content.Load<SoundEffect>();
-          //  scoreSound.Play();
+           
+            scoreSound = Content.Load<SoundEffect>("0831");
+            scoreSound.Play();
 
 
 
