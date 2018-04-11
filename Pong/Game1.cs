@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Audio;
 
 namespace Pong.iOS
 {
@@ -13,9 +14,17 @@ namespace Pong.iOS
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        private Paddle paddle;
+        private GameObjects gameObjects;
+        private Paddle computerPaddle;
+        private Paddle playerPaddle;
         private Ball ball;
+        private Score score;
+        private SoundEffect ballsong;
+        private SoundEffect scoreSound;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:Pong.iOS.Game1"/> class.
+        /// </summary>
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -30,6 +39,7 @@ namespace Pong.iOS
             graphics.IsFullScreen = true;
 
             TouchPanel.EnabledGestures = GestureType.VerticalDrag; //Moves the paddel
+            TouchPanel.EnabledGestures = GestureType.DoubleTap;
 
         }
 
@@ -55,9 +65,25 @@ namespace Pong.iOS
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            paddle = new Paddle(Content.Load<Texture2D>("Paddle"), Vector2.Zero, new Rectangle(0, 0, Window.ClientBounds.Width, Window.ClientBounds.Height));
-            ball = new Ball(Content.Load<Texture2D>("Ball"), Vector2.Zero);
-            ball.AttachTo(paddle);
+            var gameBoundaries = new Rectangle(0, 0, Window.ClientBounds.Width, Window.ClientBounds.Height);
+            var paddleTexture = Content.Load<Texture2D>("Paddle");
+            var computerPaddleLocation = new Vector2(gameBoundaries.Width - paddleTexture.Width, 0);
+
+            playerPaddle = new Paddle(paddleTexture, Vector2.Zero, gameBoundaries,PlayerTypes.HUMAN);
+            computerPaddle = new Paddle(paddleTexture, computerPaddleLocation,  gameBoundaries,PlayerTypes.COMPUTER);
+
+            ball = new Ball(Content.Load<Texture2D>("Ball"), Vector2.Zero,gameBoundaries);
+            ball.AttachTo(playerPaddle);
+
+            score = new Score(Content.Load<SpriteFont>("Consolas78"),gameBoundaries);
+
+           // ballsong = Content.Load<SoundEffect>("blip");
+           // scoreSound = Content.Load<SoundEffect>();
+          //  scoreSound.Play();
+
+
+
+            gameObjects = new GameObjects { PlayerPaddle = playerPaddle, ComputerPaddle = computerPaddle, Ball = ball,Score = score };
         }
 
         /// <summary>
@@ -71,8 +97,10 @@ namespace Pong.iOS
             // Exit() is obsolete on iOS
             //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
 
-            paddle.Update(gameTime);
-            ball.Update(gameTime);
+            playerPaddle.Update(gameTime,gameObjects);
+            computerPaddle.Update(gameTime,gameObjects);
+            ball.Update(gameTime,gameObjects);
+            score.Update(gameTime, gameObjects);
 
             // TODO: Add your update logic here            
 
@@ -88,7 +116,9 @@ namespace Pong.iOS
             graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin();
-            paddle.Draw(spriteBatch);
+            playerPaddle.Draw(spriteBatch);
+            computerPaddle.Draw(spriteBatch);
+            score.Draw(spriteBatch);
             ball.Draw(spriteBatch);
             spriteBatch.End();
 
